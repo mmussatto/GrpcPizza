@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PizzaOrdering.Data;
+using PizzaOrdering.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,31 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/orders", async (OrderContext ctx) => await ctx.Orders.ToListAsync());
+
+app.MapGet("/orders/{id}", async (OrderContext ctx, int id) => await ctx.Orders.FindAsync(id));
+
+app.MapPost(
+    "/orders",
+    async (OrderContext ctx, Order order) =>
+    {
+        await ctx.Orders.AddAsync(order);
+        await ctx.SaveChangesAsync();
+        return Results.Created($"/orders/{order.Id}", order);
+    }
+);
+
+app.MapDelete(
+    "/orders/{id}",
+    async (OrderContext ctx, int id) =>
+    {
+        var order = await ctx.Orders.FindAsync(id);
+        if (order is null)
+            return Results.NotFound();
+        ctx.Orders.Remove(order);
+        await ctx.SaveChangesAsync();
+        return Results.Ok();
+    }
+);
 
 app.Run();
