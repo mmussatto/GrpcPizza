@@ -8,6 +8,9 @@ builder.Services.AddDbContext<PizzaContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PizzaContext"))
 );
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -25,7 +28,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/", () => "Hello World!");
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/pizzas/{id}", async (PizzaContext ctx, int id) => await ctx.Pizzas.FindAsync(id));
 
