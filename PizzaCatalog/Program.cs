@@ -41,7 +41,7 @@ app.MapPost(
     {
         await ctx.Pizzas.AddAsync(pizza);
         await ctx.SaveChangesAsync();
-        return Results.Created($"/pizza/{pizza.Id}", pizza);
+        return Results.Created($"/pizzas/{pizza.Id}", pizza);
     }
 );
 
