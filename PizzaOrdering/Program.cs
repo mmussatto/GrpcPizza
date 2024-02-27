@@ -8,6 +8,9 @@ builder.Services.AddDbContext<OrderContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("OrderContext"))
 );
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -24,6 +27,9 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred creating the DB.");
     }
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/orders", async (OrderContext ctx) => await ctx.Orders.ToListAsync());
 
