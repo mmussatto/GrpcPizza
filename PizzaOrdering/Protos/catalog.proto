@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option csharp_namespace = "PizzaOrdering.Protos";
+
+import "google/protobuf/wrappers.proto";
+
+service Catalog {
+	rpc VerifyPizzaExists (VerifyPizzaRequest) returns (VerifyPizzaResponse);
+	rpc PreparePizza (PreparePizzaRequest) returns (PreparePizzaResponse);
+	rpc CancelPizza (CancelPizzaRequest) returns (CancelPizzaResponse);
+}
+
+message VerifyPizzaRequest {
+	string pizza_name = 1;
+}
+
+message VerifyPizzaResponse {
+	bool pizza_exists = 1;
+	google.protobuf.Int32Value pizza_id = 2;
+	google.protobuf.StringValue pizza_description = 3;
+}
+
+message PreparePizzaRequest {
+	int32 pizza_id = 1;
+	int32 order_id = 2;
+}
+
+message PreparePizzaResponse {
+	bool pizza_is_preparing = 1;
+	google.protobuf.StringValue error = 2;
+}
+
+message CancelPizzaResquest { 
+	int32 order_id = 1;
+}
+
+message CancelPizzaResponse {
+	bool pizza_canceled = 1;
+	google.protobuf.StringValue reponse = 2;
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option csharp_namespace = "PizzaCatalog.Protos";
+
+service Ordering {
+	rpc PizzaIsDone (PizzaIsDoneRequest) returns (PizzaIsDoneResponse);
+}
+
+message PizzaIsDoneRequest {
+	string order_id = 1;
+}
+
+message PizzaIsDoneResponse {
+	
+}
