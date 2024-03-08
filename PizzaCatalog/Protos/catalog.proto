@@ -30,7 +30,7 @@ message PreparePizzaResponse {
 	google.protobuf.StringValue error = 2;
 }
 
-message CancelPizzaResquest { 
+message CancelPizzaRequest { 
 	int32 order_id = 1;
 }
 
