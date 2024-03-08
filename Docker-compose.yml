@@ -1,0 +1,64 @@
+services:
+  catalog:
+    build: 
+      context: PizzaCatalog
+      target: final
+    container_name: catalog
+    ports:
+      - 5000:5000
+      - 5001:5001
+    depends_on:
+      catalog_db:
+        condition: service_healthy
+
+  ordering:
+    build: 
+      context: PizzaOrdering
+      target: final
+    container_name: ordering
+    ports:
+      - 5002:5002
+      - 5003:5003
+    depends_on:
+      ordering_db:
+        condition: service_healthy
+
+  catalog_db:
+    image: postgres
+    restart: on-failure
+    container_name: catalog_db
+    user: postgres
+    volumes:
+      - catalog-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=pizzaCatalog
+      - POSTGRES_PASSWORD=catalog123
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ordering_db:
+    image: postgres
+    restart: on-failure
+    container_name: ordering_db
+    user: postgres
+    volumes:
+      - ordering-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=pizzaOrdering
+      - POSTGRES_PASSWORD=order123
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  catalog-db-data:
+  ordering-db-data:
