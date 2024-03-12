@@ -65,6 +65,17 @@ app.MapDelete(
     }
 );
 
+app.MapDelete(
+    "/orders",
+    (OrderContext ctx) =>
+    {
+        foreach (var order in ctx.Orders)
+            ctx.Orders.Remove(order);
+        ctx.SaveChanges();
+        return Results.Ok();
+    }
+);
+
 app.MapPost(
     "/orderPizza",
     async (
