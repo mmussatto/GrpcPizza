@@ -25,7 +25,7 @@ public class PizzaContext : DbContext
                     new Pizza
                     {
                         Id = 2,
-                        Name = " Pepperoni and Cheese",
+                        Name = "Pepperoni and Cheese",
                         Description = "Very Nice Pizza"
                     }
                 ]
