@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PizzaCatalog;
+using PizzaCatalog.Data;
 using PizzaCatalog.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PizzaContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PizzaContext"))
 );
+
+builder.Services.AddSingleton<PreparingQueue>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -69,6 +72,13 @@ app.MapDelete(
         ctx.Pizzas.Remove(pizza);
         await ctx.SaveChangesAsync();
         return Results.Ok();
+    }
+);
+app.MapGet(
+    "/preparing",
+    (PreparingQueue queue) =>
+    {
+        return queue.PrintQueue();
     }
 );
 
