@@ -1,12 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using PizzaCatalog;
+using PizzaCatalog.Data;
 using PizzaCatalog.Models;
+using PizzaCatalog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddGrpc();
 
 builder.Services.AddDbContext<PizzaContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PizzaContext"))
 );
+
+builder.Services.AddSingleton<PreparingQueue>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -30,6 +36,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.MapGrpcService<CatalogService>();
 
 app.MapGet("/pizzas/{id}", async (PizzaContext ctx, int id) => await ctx.Pizzas.FindAsync(id));
 
@@ -69,6 +77,14 @@ app.MapDelete(
         ctx.Pizzas.Remove(pizza);
         await ctx.SaveChangesAsync();
         return Results.Ok();
+    }
+);
+
+app.MapGet(
+    "/preparing",
+    (PreparingQueue queue) =>
+    {
+        return queue.PrintQueue();
     }
 );
 

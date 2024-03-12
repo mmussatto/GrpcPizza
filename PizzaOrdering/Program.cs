@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PizzaOrdering.Data;
 using PizzaOrdering.Models;
+using PizzaOrdering.Protos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,11 @@ builder.Services.AddDbContext<OrderContext>(opt =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddGrpcClient<Catalog.CatalogClient>(o =>
+{
+    o.Address = new Uri("http://catalog:5000");
+});
 
 var app = builder.Build();
 
@@ -55,6 +62,63 @@ app.MapDelete(
         ctx.Orders.Remove(order);
         await ctx.SaveChangesAsync();
         return Results.Ok();
+    }
+);
+
+app.MapDelete(
+    "/orders",
+    (OrderContext ctx) =>
+    {
+        foreach (var order in ctx.Orders)
+            ctx.Orders.Remove(order);
+        ctx.SaveChanges();
+        return Results.Ok();
+    }
+);
+
+app.MapPost(
+    "/orderPizza",
+    async (
+        string pizzaName,
+        [FromServices] OrderContext ctx,
+        [FromServices] Catalog.CatalogClient client
+    ) =>
+    {
+        var pizzaExistsResponse = client.VerifyPizzaExists(
+            new VerifyPizzaRequest { PizzaName = pizzaName }
+        );
+
+        Console.WriteLine(
+            @$"----- RESPONSE ----- \n 
+			Exists = {pizzaExistsResponse.PizzaExists},
+			Id = {pizzaExistsResponse.PizzaId},
+			Description = {pizzaExistsResponse.PizzaDescription},
+			TESTE = {pizzaExistsResponse.PizzaExists == true}"
+        );
+
+        if (!pizzaExistsResponse.PizzaExists)
+            return Results.NotFound(pizzaExistsResponse);
+
+        int pizzaId = (int)pizzaExistsResponse.PizzaId;
+
+        var order = new Order() { PizzaId = pizzaId };
+
+        await ctx.Orders.AddAsync(order);
+        await ctx.SaveChangesAsync();
+
+        Console.WriteLine(
+            @$"----- RESPONSE ----- \n 
+					ID: {order.Id},
+					Pizza: {order.PizzaId},
+					Date: {order.OrderDateTime},
+					Done: {order.Done}"
+        );
+
+        var preparePizzaResponse = client.PreparePizza(
+            new PreparePizzaRequest { PizzaId = pizzaId, OrderId = order.Id }
+        );
+
+        return Results.Ok(preparePizzaResponse);
     }
 );
 
