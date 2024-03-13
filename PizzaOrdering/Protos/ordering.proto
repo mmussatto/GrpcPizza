@@ -7,7 +7,7 @@ service Ordering {
 }
 
 message PizzaIsDoneRequest {
-	string order_id = 1;
+	int32 order_id = 1;
 }
 
 message PizzaIsDoneResponse {
