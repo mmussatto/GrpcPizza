@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PizzaCatalog;
 using PizzaCatalog.Data;
 using PizzaCatalog.Models;
+using PizzaCatalog.Protos;
 using PizzaCatalog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,11 @@ builder.Services.AddSingleton<PreparingQueue>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddGrpcClient<Ordering.OrderingClient>(o =>
+{
+    o.Address = new Uri("http://ordering:5002");
+});
 
 var app = builder.Build();
 

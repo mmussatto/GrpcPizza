@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using PizzaOrdering.Data;
 using PizzaOrdering.Models;
 using PizzaOrdering.Protos;
+using PizzaOrdering.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddGrpc();
 
 builder.Services.AddDbContext<OrderContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("OrderContext"))
@@ -37,6 +40,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.MapGrpcService<OrderingService>();
 
 app.MapGet("/orders", async (OrderContext ctx) => await ctx.Orders.ToListAsync());
 
