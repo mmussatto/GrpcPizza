@@ -12,7 +12,17 @@ public static class OrderingEndpoints
     {
         var path = routes.MapGroup("/api/v1/ordering");
 
-        path.MapGet("/orders", async (OrderContext ctx) => await ctx.Orders.ToListAsync());
+        path.MapGet(
+            "/orders",
+            async (OrderContext ctx) =>
+            {
+                var orders = await ctx.Orders.ToListAsync();
+                if (orders.Count == 0)
+                    return Results.NotFound(new { error = "No orders found." });
+                else
+                    return Results.Ok(orders);
+            }
+        );
 
         path.MapGet(
             "/orders/{id}",
