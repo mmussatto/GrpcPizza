@@ -5,7 +5,7 @@ namespace PizzaCatalog.Data;
 
 public record PreparingPizza
 {
-    public Pizza Pizza { get; set; }
+    public required Pizza Pizza { get; set; }
     public int OrderId { get; set; }
     public bool IsDone { get; set; } = false;
 
@@ -51,6 +51,11 @@ public class PreparingQueue
 
     public string PrintQueue()
     {
+        if (_preparingQueue.Count == 0)
+        {
+            return "No Pizzas are being prepared right now!";
+        }
+
         var queueStr = $"";
         foreach (var pizza in _preparingQueue)
         {
