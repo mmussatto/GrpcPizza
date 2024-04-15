@@ -11,9 +11,10 @@ public static class CatalogEndpoints
         var path = routes.MapGroup("/api/v1/catalog");
 
         path.MapGet(
-            "/pizzas/{id}",
-            async (PizzaContext ctx, int id) => await ctx.Pizzas.FindAsync(id)
-        );
+                "/pizzas/{id}",
+                async (PizzaContext ctx, int id) => await ctx.Pizzas.FindAsync(id)
+            )
+            .ExcludeFromDescription();
 
         path.MapGet("/pizzas", async (PizzaContext ctx) => await ctx.Pizzas.ToListAsync());
 
@@ -28,18 +29,19 @@ public static class CatalogEndpoints
         );
 
         path.MapPut(
-            "/pizzas/{id}",
-            async (PizzaContext ctx, Pizza updatePizza, int id) =>
-            {
-                var pizza = await ctx.Pizzas.FindAsync(id);
-                if (pizza is null)
-                    return Results.NotFound();
-                pizza.Name = updatePizza.Name;
-                pizza.Description = updatePizza.Description;
-                await ctx.SaveChangesAsync();
-                return Results.NoContent();
-            }
-        );
+                "/pizzas/{id}",
+                async (PizzaContext ctx, Pizza updatePizza, int id) =>
+                {
+                    var pizza = await ctx.Pizzas.FindAsync(id);
+                    if (pizza is null)
+                        return Results.NotFound();
+                    pizza.Name = updatePizza.Name;
+                    pizza.Description = updatePizza.Description;
+                    await ctx.SaveChangesAsync();
+                    return Results.NoContent();
+                }
+            )
+            .ExcludeFromDescription();
 
         path.MapDelete(
             "/pizzas/{id}",

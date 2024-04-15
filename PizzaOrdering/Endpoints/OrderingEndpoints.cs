@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PizzaOrdering.Data;
@@ -25,19 +26,21 @@ public static class OrderingEndpoints
         );
 
         path.MapGet(
-            "/orders/{id}",
-            async (OrderContext ctx, int id) => await ctx.Orders.FindAsync(id)
-        );
+                "/orders/{id}",
+                async (OrderContext ctx, int id) => await ctx.Orders.FindAsync(id)
+            )
+            .ExcludeFromDescription();
 
         path.MapPost(
-            "/orders",
-            async (OrderContext ctx, Order order) =>
-            {
-                await ctx.Orders.AddAsync(order);
-                await ctx.SaveChangesAsync();
-                return Results.Created($"/orders/{order.Id}", order);
-            }
-        );
+                "/orders",
+                async (OrderContext ctx, Order order) =>
+                {
+                    await ctx.Orders.AddAsync(order);
+                    await ctx.SaveChangesAsync();
+                    return Results.Created($"/orders/{order.Id}", order);
+                }
+            )
+            .ExcludeFromDescription();
 
         path.MapDelete(
             "/orders/{id}",
